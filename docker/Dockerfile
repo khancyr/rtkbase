@@ -34,7 +34,8 @@ RUN wget -qO - https://github.com/tomojitakasu/RTKLIB/archive/v2.4.3-b34.tar.gz 
     && rm -rf RTKLIB-2.4.3-b34/
 
 # RTKBase
-RUN git clone https://github.com/khancyr/rtkbase.git \
+RUN git clone https://github.com/khancyr/rtkbase.git --depth 2 --no-single-branch \
+    && cd rtkbase && git checkout docker && cd .. \
     && touch rtkbase/settings.conf \
     && rm -rf rtkbase/.git
 
