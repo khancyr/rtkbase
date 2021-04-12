@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     wget \
     gpsd \
     chrony \
+    psmisc \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # RTKLib
@@ -32,24 +33,28 @@ RUN wget -qO - https://github.com/tomojitakasu/RTKLIB/archive/v2.4.3-b34.tar.gz 
     && make -j2 --directory=RTKLIB-2.4.3-b34/app/consapp/convbin/gcc install \
     && rm -rf RTKLIB-2.4.3-b34/
 
+WORKDIR /rtkbase
 # RTKBase
-RUN git clone https://github.com/khancyr/rtkbase.git --depth 1 --no-single-branch \
-    && cd rtkbase && git checkout docker && cd .. \
-    && touch rtkbase/settings.conf \
-    && rm -rf rtkbase/.git
+COPY web_app /rtkbase/web_app
+COPY docker /rtkbase/docker
+COPY receiver_cfg /rtkbase/receiver_cfg
+COPY settings.conf.default /rtkbase/settings.conf.default
+COPY *.sh /rtkbase/
+COPY tools/install.sh /rtkbase/install.sh
 
+RUN touch /rtkbase/settings.conf
 
+RUN sed -i 's/^pystemd/\#pystemd/' /rtkbase/web_app/requirements.txt
 RUN python3 -m pip install -r /rtkbase/web_app/requirements.txt
 RUN python3 -m pip install supervisor
 
-RUN sed -i -e "s/\$(logname)/root/g" /rtkbase/tools/install.sh
+RUN sed -i -e "s/\$(logname)/root/g" /rtkbase/install.sh
 
 # Chrony
 RUN grep -q 'set larger delay to allow the GPS' /etc/chrony/chrony.conf || echo '# set larger delay to allow the GPS source to overlap with the other sources and avoid the falseticker status' >> /etc/chrony/chrony.conf && grep -qxF 'refclock SHM 0 refid GNSS precision 1e-1 offset 0 delay 0.2' /etc/chrony/chrony.conf || echo 'refclock SHM 0 refid GNSS precision 1e-1 offset 0 delay 0.2' >> /etc/chrony/chrony.conf
 EXPOSE 9090/udp
 
 # GPSD
-COPY gpsd.sh /rtkbase/gpsd.sh
 RUN sed -i 's/^START_DAEMON=.*/START_DAEMON="false"/' /etc/default/gpsd
 
 # Expose Port (Note: if you change it do it as well in surpervisord.conf)
