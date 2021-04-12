@@ -20,7 +20,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     wget \
     gpsd \
     chrony \
-    supervisor \
     && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # RTKLib
@@ -41,6 +40,7 @@ RUN git clone https://github.com/khancyr/rtkbase.git --depth 1 --no-single-branc
 
 
 RUN python3 -m pip install -r /rtkbase/web_app/requirements.txt
+RUN python3 -m pip install supervisor
 
 RUN sed -i -e "s/\$(logname)/root/g" /rtkbase/tools/install.sh
 
