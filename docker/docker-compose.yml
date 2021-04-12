@@ -1,25 +1,10 @@
 version: '2'
 services:
-  chrony:
-    build: ./chrony
-    image: c_chrony:1.0.0
-    network_mode: host
-    restart: on-failure
-
-  gpsd:
-    build: ./gpsd
-    image: c_gpsd:1.0.0
-    network_mode: host
-    restart: on-failure
-
   rtkbase:
-    build: ./rtkbase
+    build: .
     image: rtkbase:1.0.0
     network_mode: host
     privileged: true
-    depends_on:
-      - "chrony"
-      - "gpsd"
     devices:
       - "/dev/ttyACM0:/dev/ttyACM0"
     cap_add:
