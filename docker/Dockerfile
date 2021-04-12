@@ -52,11 +52,8 @@ EXPOSE 9090/udp
 COPY gpsd.sh /rtkbase/gpsd.sh
 RUN sed -i 's/^START_DAEMON=.*/START_DAEMON="false"/' /etc/default/gpsd
 
-# Docker's supervisor
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
 # Expose Port (Note: if you change it do it as well in surpervisord.conf)
 EXPOSE 8083
 
-CMD ["/usr/bin/supervisord"]
+CMD ["/usr/local/bin/supervisord -c /rtkbase/docker/supervior.conf"]
 
