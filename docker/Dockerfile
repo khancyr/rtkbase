@@ -55,5 +55,5 @@ RUN sed -i 's/^START_DAEMON=.*/START_DAEMON="false"/' /etc/default/gpsd
 # Expose Port (Note: if you change it do it as well in surpervisord.conf)
 EXPOSE 8083
 
-CMD ["/usr/local/bin/supervisord -c /rtkbase/docker/supervior.conf"]
+CMD ["/usr/local/bin/supervisord -c /rtkbase/docker/supervisord.conf"]
 
