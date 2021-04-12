@@ -42,10 +42,7 @@ RUN git clone https://github.com/khancyr/rtkbase.git --depth 2 --no-single-branc
 
 RUN python3 -m pip install -r /rtkbase/web_app/requirements.txt
 
-RUN wget https://raw.githubusercontent.com/Stefal/rtkbase/master/tools/install.sh -O /rtkbase/install.sh \
-    && chmod +x /rtkbase/install.sh
-
-RUN sed -i -e "s/\$(logname)/root/g" /rtkbase/install.sh
+RUN sed -i -e "s/\$(logname)/root/g" /rtkbase/tools/install.sh
 
 # Chrony
 RUN grep -q 'set larger delay to allow the GPS' /etc/chrony/chrony.conf || echo '# set larger delay to allow the GPS source to overlap with the other sources and avoid the falseticker status' >> /etc/chrony/chrony.conf && grep -qxF 'refclock SHM 0 refid GNSS precision 1e-1 offset 0 delay 0.2' /etc/chrony/chrony.conf || echo 'refclock SHM 0 refid GNSS precision 1e-1 offset 0 delay 0.2' >> /etc/chrony/chrony.conf

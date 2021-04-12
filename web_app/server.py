@@ -285,7 +285,7 @@ def downloadLog(log_name):
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
     if current_user.is_authenticated:
-        return red wrapper around supervirect(url_for('status_page'))
+        return redirect(url_for('status_page'))
     loginform = LoginForm()
     if loginform.validate_on_submit():
         user = User('admin')
