@@ -35,7 +35,7 @@ class ServiceController(object):
         return str(self.manager.supervisor.getProcessInfo(self.unit))
 
     def get_log(self):
-        return str(self.manager.supervisor.tailProcessLog(self.unit), 0, 2000)
+        return str(self.manager.supervisor.tailProcessLog(self.unit, 0, 2000))
 
     def start(self):
         self.manager.supervisor.startProcess(self.unit)
