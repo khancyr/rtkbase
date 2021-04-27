@@ -316,16 +316,9 @@ def diagnostic():
     getServicesStatus()
     logs = []
     for service in services_list:
-        sysctl_status = subprocess.run(['systemctl', 'status', service['service_unit']],
-                                stdout=subprocess.PIPE,
-                                universal_newlines=True)
-        journalctl = subprocess.run(['journalctl', '--since', '7 days ago', '-u', service['service_unit']], 
-                                 stdout=subprocess.PIPE, 
-                                 universal_newlines=True)
-        
-        #Replace carrier return to <br> for html view
-        sysctl_status = sysctl_status.stdout.replace('\n', '<br>') 
-        journalctl = journalctl.stdout.replace('\n', '<br>')
+        sysctl_status = service['unit'].status_full()
+        journalctl = service['unit'].get_log()
+
         active_state = "Active" if service['active'] == True else "Inactive"
         logs.append({'name' : service['service_unit'], 'active' : active_state, 'sysctl_status' : sysctl_status, 'journalctl' : journalctl})
         

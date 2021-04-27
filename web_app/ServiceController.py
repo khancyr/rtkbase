@@ -1,42 +1,48 @@
-import os
-from pystemd.systemd1 import Unit
-from pystemd.systemd1 import Manager
+from xmlrpc.client import ServerProxy
+import supervisor.xmlrpc
+
 
 class ServiceController(object):
     """
-        A simple wrapper around pystemd to manage systemd services
+        A simple supervisor commands to manage services
     """
-    
-    manager = Manager(_autoload=True)
 
     def __init__(self, unit):
         """
-            param: unit: a systemd unit name (ie str2str_tcp.service...)
+            param: unit: a systemd unit name (ie str2str_tcp...)
         """
-        self.unit = Unit(bytes(unit, 'utf-8'), _autoload=True)
-        
+        self.unit = unit.split(".")[0]
+        self.manager = ServerProxy('http://127.0.0.1',
+                                   transport=supervisor.xmlrpc.SupervisorTransport(None, None,
+                                                                                   'unix:///tmp/supervisor.sock'))
+
     def isActive(self):
-        if self.unit.Unit.ActiveState == b'active':
+        if self.manager.supervisor.getProcessInfo(self.unit)["state"] == 20:
             return True
-        elif self.unit.Unit.ActiveState == b'activating':
-            #TODO manage this transitionnal state differently
+        elif self.manager.supervisor.getProcessInfo(self.unit)["state"] == 10:
+            # TODO manage this transitionnal state differently
             return True
         else:
             return False
 
     def getUser(self):
-        return self.unit.Service.User.decode()
-    
+        return "root"  # TODO : fix this
+
     def status(self):
-        return (self.unit.Unit.SubState).decode()
+        return self.manager.supervisor.getProcessInfo(self.unit)["statename"]
+
+    def status_full(self):
+        return str(self.manager.supervisor.getProcessInfo(self.unit))
+
+    def get_log(self):
+        return str(self.manager.supervisor.tailProcessLog(self.unit, 0, 2000))
 
     def start(self):
-        self.manager.Manager.EnableUnitFiles(self.unit.Unit.Names, False, True)
-        return self.unit.Unit.Start(b'replace')
-        
+        self.manager.supervisor.startProcess(self.unit)
+
     def stop(self):
-        self.manager.Manager.DisableUnitFiles(self.unit.Unit.Names, False)
-        return self.unit.Unit.Stop(b'replace')
-        
+        self.manager.supervisor.stopProcess(self.unit)
+
     def restart(self):
-        return self.unit.Unit.Restart(b'replace')
+        self.stop()
+        self.start()
