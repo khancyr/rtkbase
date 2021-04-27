@@ -1,0 +1,28 @@
+[global]
+  sendAnonymousUsage = false
+  checkNewVersion = true
+
+[log]
+  level = "INFO"
+  format = "common"
+
+[providers]
+  [providers.docker]
+    endpoint = "unix:///var/run/balena.sock"
+    #endpoint = "unix:///var/run/docker.sock"
+    watch = true
+    exposedByDefault = false
+    swarmMode = false
+
+[api]
+  dashboard = true
+  debug = false
+  insecure = true
+
+[entryPoints]
+  [entryPoints.insecure]
+    address = ":80"
+    [entryPoints.insecure.forwardedHeaders]
+      insecure = true
+  [entryPoints.secure]
+    address = ":443"

@@ -1,0 +1,46 @@
+version: '2'
+services:
+  rtkbase:
+    build: .
+    image: rtkbase:1.0.0
+    ports:
+      - 8001:80
+      - 5016:5016
+      - 9001:9001
+    devices:
+      - "/dev/ttyACM0:/dev/ttyACM0"
+    #volumes:
+    #  - "/run/udev:/run/udev:ro"
+    cap_add:
+      - SYS_RAWIO
+    restart: on-failure
+    labels:
+      - "traefik.enable=true"
+      #- "traefik.http.routers.rtkbase.entrypoints=insecure"
+      - "traefik.http.routers.rtkbase.rule=PathPrefix(`/`)"
+      - "traefik.http.services.rtkbase.loadbalancer.server.port=80"
+
+
+  traefik:
+    build: ./docker/traefik
+    image: traefik-rtkbase:latest
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    labels:
+      - "io.balena.features.balena-socket=true"
+    #volumes:
+    #  - /var/run/docker.sock:/var/run/docker.sock
+
+  zerotier:
+    build: ./docker/zerotier
+    image: zerotier-rtkbase:latest
+    restart: unless-stopped
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+    devices:
+      - "/dev/net/tun:/dev/net/tun"
