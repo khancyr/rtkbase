@@ -22,6 +22,8 @@ COPY --from=builder /usr/sbin/zerotier-cli /usr/sbin/zerotier-cli
 COPY --from=builder /usr/sbin/zerotier-idtool /usr/sbin/zerotier-idtool
 COPY --from=builder /usr/sbin/zerotier-one /usr/sbin/zerotier-one
 COPY --from=builder /var/lib/zerotier-one/main.sh /main.sh
+
+# Modify here your network ID
 RUN mkdir /var/lib/zerotier-one/networks.d/ && touch /var/lib/zerotier-one/networks.d/3efa5cb78a95886a.conf
 RUN echo "allowManaged=1\nallowGlobal=1\nallowDefault=0" > /var/lib/zerotier-one/networks.d/3efa5cb78a95886a.local.conf
 

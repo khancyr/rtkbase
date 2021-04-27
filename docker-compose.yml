@@ -34,6 +34,8 @@ services:
     #volumes:
     #  - /var/run/docker.sock:/var/run/docker.sock
 
+
+# change your network id on line 25 and 26 on docker/zerotier/Dockerfile
   zerotier:
     build: ./docker/zerotier
     image: zerotier-rtkbase:latest
